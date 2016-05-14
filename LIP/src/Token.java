@@ -8,9 +8,11 @@ public class Token {
         this.type = type;
         this.text = text;
     }
-
+    public String rep() {//representation
+        return text;
+    }
     @Override
     public String toString() {
-        return "<" + text + " " + ListLexer.typeToName.get(type) + ">";
+        return "<" + text + " " +Lexer.typeToName.get(type) + ">";
     }
 }
