@@ -10,8 +10,8 @@ import Exception.*;
 语义分析，回溯法，任意长度向前看
  */
 public class Parser {
-    private int index = 0;
-    private List<Token> lookahead;//环形缓冲区
+    protected int index = 0;
+    protected List<Token> lookahead;//环形缓冲区
     private List<Integer> markers;//存放当前的index以便后面回溯（mark and release）
     private Lexer lexer;
     private int k; //LL(K)文法
@@ -25,7 +25,7 @@ public class Parser {
 //            consume();
 //        }
     }
-    public int pos() {
+    public int index() {
         return index;
     }
     public int LAT(int i) {//LL(1)
@@ -33,17 +33,18 @@ public class Parser {
     }
     public Token LT(int i) {//LL(k)\\
         sync(i);//确保前面有i个Token
+        //System.out.println(lookahead.get(index + i - 1));
         return lookahead.get(index + i - 1);
         //return lookahead[(index + i - 1) % k];//环式取值
     }
-    public void mark() {//标记存入，以便后面收回
+    protected void mark() {//标记存入，以便后面收回
         markers.add(index);
     }
-    public void release() {//从marker栈中取出,并销毁
+    protected void release() {//从marker栈中取出,并销毁
         index = markers.get(markers.size() - 1);
         markers.remove(markers.size() - 1);
     }
-    private void sync(int i) {
+    protected void sync(int i) {
         if (index + i - 1 > (lookahead.size() - 1)) {
             int n = index + i - 1 - (lookahead.size() - 1);
             fill(n);//向缓冲区填入n个Tooken
@@ -56,7 +57,7 @@ public class Parser {
         }
     }
 
-    public void consume() {
+    protected void consume() {
         index++;
 //        lookahead[index] = lexer.nextToken();
 //        index = (index+1) % k;
@@ -74,7 +75,7 @@ public class Parser {
         }
     }
 
-    private boolean isSpeculating() {
+    protected boolean isSpeculating() {
         return !markers.isEmpty();//若标记还在表明还在推断
     }
 }
