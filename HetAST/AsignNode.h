@@ -8,8 +8,9 @@
 #include "StatNode.h"
 #include "VarNode.h"
 #include "ExprNode.h"
+class IndependentPrintVisitor;
 class AsignNode : public StatNode{
-
+    friend class IndependentPrintVisitor;
 public:
     AsignNode(VarNode* id, const Token &t, ExprNode* value) :
             var(id), StatNode(t), val(value){ }

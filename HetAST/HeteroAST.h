@@ -12,9 +12,11 @@ class HeteroAST
 {
 public:
     HeteroAST(const Token& t);
+    TOKEN_TYPES getType() const{ return tp->getType();}
+    void printToken() const {cout << *tp;}
     //~HeteroAST();
     //string toString();
-    //virtual void print() = 0;
+    virtual void print() = 0;
 protected:
     //Token token;
     shared_ptr<Token> tp;

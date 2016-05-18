@@ -3,7 +3,7 @@
 #include <string>
 #include <iostream>
 enum TOKEN_TYPES {
-    INT,EQUAL,PRINT,PLUS,VAR
+    INT,EQUAL,PLUS,VAR
 };
 using namespace std;
 class Token {
@@ -11,7 +11,7 @@ class Token {
 public:
     Token(const Token& t);
     Token(TOKEN_TYPES type, const string& s);
-    int getType(){ return type; }
+    TOKEN_TYPES getType(){ return type; }
     string toString(){ return s; }
 private:
     TOKEN_TYPES type;
