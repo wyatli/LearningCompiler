@@ -35,6 +35,7 @@ private:
     char getCh() ;
     Token reservedlookup(const string& s)const ;//看当前ID是否为保留字
 public:
+    int lineno;
     Scanner(const string& source){
         file.open(source);
     }
@@ -60,24 +61,37 @@ Token Scanner::getNextToken() {
                     switch (c) {
                         case EOF:
                         return Token(EOF_TYPE, "EOF");
-                    case '+':
-                        return Token(PLUS, "+");
-                    case '-':
-                        return Token(MINUS, "-");
-                    case '*':
-                        return Token(TIMES, "*");
-                    case '/':
-                        return Token(OVER, "/");
-                    case '=':
-                        return Token(EQ, "=");
-                    case '(':
-                        return Token(LPAREN, "(");
-                    case ')':
-                        return Token(RPAREN, ")");
-                    case ';':
-                        return Token(SEMI, ";");
-                    case '<':
-                        return Token(LT, "<");
+                        case '+':
+                            return Token(PLUS, "+");
+                        case '-':
+                            return Token(MINUS, "-");
+                        case '*':
+                            return Token(TIMES, "*");
+                        case '/':
+                            return Token(OVER, "/");
+                        case '=':
+                            return Token(EQ, "=");
+                        case '(':
+                            return Token(LPAREN, "(");
+                        case ')':
+                            return Token(RPAREN, ")");
+                        case ';':
+                            return Token(SEMI, ";");
+                        case '<':{
+                            if (getCh() == '=') {
+                                return Token(LT, "<=");
+                            }
+                            ungetCh();
+                            return Token(LT,"<");
+                        }
+                        case '>': {
+                            if (getCh() == '=') {
+                                return Token(GE, ">=");
+                            }
+                            ungetCh();
+                            return Token(GT,"<");
+                        }
+
                     default:
                         return Token(ERROR, "[Error]");
                     }
@@ -126,6 +140,7 @@ char Scanner::getCh() {
     if (!file.eof()) {
         if (linepos >= strlen(buffer)||linepos == 0) {//若当前linepos为0或linepos>buffer的size时，重新填充BUFFER
             file.getline(buffer,255);
+            lineno ++;
             linepos = 0;
             return buffer[linepos++];
         }
