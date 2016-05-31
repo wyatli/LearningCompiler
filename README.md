@@ -15,3 +15,7 @@ Compiler
 ####HeteroAST
 >9. HeteroAST.java  -->> StatNode.java && ExprNode.java//抽象类，异规则语法树，后面两个为继承类，代表语句（statment）和表达式（expresion）<br>
 >8. IndependentPrintVisitor.java //独立访问者模式，把访问和树的节点解耦<br>
+
+####TINY（编译原理及实践的小型编译器）
+>1. Scanner.h //扫描器，用DFA实现匹配，getNextToken
+>2. Token.h //同上
