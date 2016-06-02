@@ -24,6 +24,7 @@ struct {//保留字，得到的ID根据这个表来查询是否为保留字
                      {"repeat",REPEAT},{"until",UNTIL},
                      {"read",READ},{"write",WRITE}};
 class Scanner {
+    friend void testScanner(const string& s);
 private:
     int linepos = 0;
     ifstream file;
@@ -35,7 +36,7 @@ private:
     char getCh() ;
     Token reservedlookup(const string& s)const ;//看当前ID是否为保留字
 public:
-    int lineno;
+    int lineno = 0;
     Scanner(const string& source){
         file.open(source);
     }
@@ -43,6 +44,7 @@ public:
 };
 
 Token Scanner::getNextToken() {
+    //cout <<"sb";
     char stringBuf[40];//存放单词的缓冲
     int  stringIndex = 0;//缓冲索引
 
@@ -55,11 +57,16 @@ Token Scanner::getNextToken() {
                 else if(c == ':')state = INASSIGN;
                 else if(isdigit(c)){stringBuf[stringIndex++] = c;state = INNUM;}
                 else if(isalpha(c)){stringBuf[stringIndex++] = c; state = INID;}
-                else if(c == ' ' || c == '\t' || c == '\n')state = START;
+                else if(c == ' ' || c == '\t' || c == '\n') {
+                    state = START;
+                    if (c == '\n') {
+						cout << "linno:  " << lineno;
+                    }
+                }
                 else {
                         state = START;//重启自动机
                     switch (c) {
-                        case EOF:
+                        case '#':
                         return Token(EOF_TYPE, "EOF");
                         case '+':
                             return Token(PLUS, "+");
@@ -146,7 +153,9 @@ char Scanner::getCh() {
         }
         return buffer[linepos++];
     }
-    return EOF;
+    return buffer[linepos++];
+//    string s = "if 0 < x then \n fact := 1;\n this :=12;\n else\n  x:= 20;#";
+//    return s[linepos++];
 }
 
 char Scanner::buffer[] = "";
@@ -161,12 +170,17 @@ Token Scanner::reservedlookup(const string &s) const {
 }
 void testScanner(const string& s) {//测试
     Scanner scan(s);
-    Token t;
-    while (t.getType() != EOF_TYPE) {
-        t = scan.getNextToken();
+//    char c;
+//    while ((c = scan.getCh())) {
+//        cout << c<<" ";
+//    }
+//    cout <<endl;
+    Token t = scan.getNextToken();
+    while (t.type != EOF_TYPE) {
         cout << t <<endl;
+        t = scan.getNextToken();
     }
-    cout << t;
+    cout<<t<<endl;
 }
 
 

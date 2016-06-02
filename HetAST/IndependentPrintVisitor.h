@@ -9,11 +9,11 @@
  */
 #include <cstdlib>
 #include "HeteroAST.h"
-//#include "AddNode.h"
+#include "AddNode.h"
 #include "AsignNode.h"
 #include "IntNode.h"
 #include "VarNode.h"
-class  AddNode;
+//class  AddNode;
 class IndependentPrintVisitor {
 public:
     void print(const HeteroAST& node);//根节点，调度算法调度节点

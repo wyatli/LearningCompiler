@@ -1,14 +1,14 @@
 //
 // Created by abc84 on 2016/5/16.
 //
-
+//#pragma once
 #ifndef HETAST_ADDNODE_H
 #define HETAST_ADDNODE_H
 
 //#include "IndependentPrintVisitor.h"
 #include "ExprNode.h"
 //#include "IndependentPrintVisitor.h"
-class IndependentPrintVisitor;
+//class IndependentPrintVisitor;
 class AddNode: public ExprNode{
     //friend void  IndependentPrintVisitor::print(const AddNode &node);
     friend class IndependentPrintVisitor;

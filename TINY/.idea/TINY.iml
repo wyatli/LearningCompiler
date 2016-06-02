@@ -4,7 +4,7 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/Scanner.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/main.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Parser.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Tree.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Token.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Parser.h" isTestSource="false" />
