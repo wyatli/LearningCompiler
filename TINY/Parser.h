@@ -86,9 +86,9 @@ private:
     Tree* stat();
     Tree* if_stat();
     Tree* asign_stat();
-//    shared_ptr<TreeNode> repeat_stat();
-//    shared_ptr<TreeNode> read_stat();
-//    shared_ptr<TreeNode> write_stat();
+    Tree* repeat_stat();
+    Tree* read_stat();
+    Tree* write_stat();
     Tree* exp();
     Tree* simple_exp();
     Tree* term();
@@ -122,7 +122,6 @@ Tree* Parser::stat_seq() {
 void Parser::match(TOKEN_TYPES type) {
     if (type == current.type) {
         current = scanner.getNextToken();
-        //cout <<current <<endl;
     }
     else {
         cout << " expected type " << name[type] <<" found " << name[current.type]
@@ -136,14 +135,14 @@ Tree* Parser::stat() {
     switch (current.type) {
         case IF:
             return if_stat();
-//        case REPEAT:
-//            return repeat_stat();
         case ID:
             return asign_stat();
-//        case READ:
-//            return read_stat();
-//        case WRITE:
-//            return write_stat();
+        case REPEAT:
+            return repeat_stat();
+        case READ:
+            return read_stat();
+        case WRITE:
+            return write_stat();
         default:
                                 cout << "unexpected token: " << name[current.type] << " at lineno" << scanner.lineno << endl;
             current = scanner.getNextToken();
@@ -152,6 +151,7 @@ Tree* Parser::stat() {
 }
 
 Tree* Parser::if_stat() {//if exp then stat_seq else stat_seq end
+
     Tree* node = new Tree(IF);
     match(IF);
     node->addChild(exp());
@@ -167,6 +167,7 @@ Tree* Parser::if_stat() {//if exp then stat_seq else stat_seq end
 }
 
 Tree *Parser::asign_stat() {
+
     Tree* node = new Tree(ASSIGN,current.toString());
     node->setName(current.toString());
     match(ID);
@@ -174,11 +175,34 @@ Tree *Parser::asign_stat() {
     node->addChild(exp());
     return node;
 }
+Tree* Parser::repeat_stat() {//repeat stat_seq until exp
+    match(REPEAT);
+    Tree* left = stat_seq();
+    match(UNTIL);
+    Tree* right = exp();
+    Tree* node = new Tree(REPEAT);
+    node->addChild(left);
+    node->addChild(right);
+    return node;
+}
+Tree* Parser::read_stat() {//read id 读入
+    match(READ);
+    Tree* node = new Tree(READ);
+    node->setName(current.toString());
+    match(ID);
+    return node;
+}
+Tree* Parser::write_stat() {//write exp 输出
+    match(WRITE);
+    Tree* node = new Tree(WRITE);
+    node->addChild(exp());
+    return node;
+}
 Tree* Parser::exp() {//exp ->　simple_exp compop simple_exp
     //return std::shared_ptr<TreeNode>();
     Tree* left = simple_exp();
     Tree* node = left;
-    if(current.type == LT || current == LE || // < <= == > >=
+    while(current.type == LT || current == LE || // < <= == > >=
             current.type == EQ ||
             current.type == GT || current.type == GE) {
         node = new Tree(current.type);
@@ -193,10 +217,9 @@ Tree* Parser::exp() {//exp ->　simple_exp compop simple_exp
 Tree *Parser::simple_exp() {//term {addop term}
     Tree* left = term();
     Tree* node = left;
-    TOKEN_TYPES type = current.type;
-    while (type == PLUS || type == MINUS) {
-        node = new Tree(type);
-        match(type);
+    while (current.type == PLUS || current.type == MINUS) {
+        node = new Tree(current.type);
+        match(current.type);
         node->addChild(left);
         Tree* right = term();
         node->addChild(right);
@@ -206,6 +229,7 @@ Tree *Parser::simple_exp() {//term {addop term}
 }
 
 Tree *Parser::term() {// factor {mulop factor}
+
     Tree* left = factor();
     Tree* node = left;
     //TOKEN_TYPES type = current.type;
@@ -221,6 +245,7 @@ Tree *Parser::term() {// factor {mulop factor}
 }
 
 Tree *Parser::factor() {//(exp) || NUM || ID
+
     TOKEN_TYPES type = current.type;
     Token temp(current);
     switch (type) {
@@ -229,9 +254,12 @@ Tree *Parser::factor() {//(exp) || NUM || ID
             int num;
             stringstream (temp.toString()) >> num;
             return new Tree(NUM, num);
-        case ID:
+        case ID: {
             match(ID);
-            return new Tree(ID, temp.toString());
+            Tree* t = new Tree(ID, temp.toString());
+            t->setName(temp.toString());
+            return t;
+        }
         case LPAREN:{
             match(LPAREN);
             Tree* t =  exp();
@@ -239,7 +267,7 @@ Tree *Parser::factor() {//(exp) || NUM || ID
             return t;
         }
         default:
-                                cout << "unexpected token: " << name[current.type] << "at lineno" << scanner.lineno;
+                                cout << "unexpected token: " << name[current.type] << "at lineno" << scanner.lineno << endl;
             current = scanner.getNextToken();
             return nullptr;
     }
@@ -249,6 +277,8 @@ Tree *Parser::factor() {//(exp) || NUM || ID
 void testParser(const string& s) {
     Parser p(s);
     Tree* t = p.getAST();
+    t;
+    cout <<endl;
     printTree(t);
 }
 

@@ -10,7 +10,6 @@
 #include <set>
 #include "Token.h"
 
-static int indent = 0;
 set <TOKEN_TYPES> expNode = {NUM, ID, EQ, LT, GT, LE, GE, PLUS, MINUS, TIMES, OVER};
 set <TOKEN_TYPES> stmtNode = {IF, ASSIGN, READ, WRITE, REPEAT};
 typedef enum {
@@ -22,6 +21,9 @@ class Tree {
     friend void printTree(const Tree *);
 
 private:
+    void print() const {
+        cout << type;
+    }
     vector<Tree *> child;
     //子节点
     Tree *next;
@@ -37,12 +39,12 @@ public:
 
     //virtual void print();
 
-    Tree(TOKEN_TYPES type) : type(type) { }
+    Tree(TOKEN_TYPES type) : type(type),child(0, nullptr), next(nullptr){ }//必须初始化容器,和指针
 
-    Tree(TOKEN_TYPES type, const string &name) : type(type) { this->name = name; };
+    Tree(TOKEN_TYPES type, const string &n) : Tree(type) { this->name = name; };
 
     //id节点
-    Tree(TOKEN_TYPES type, int val) : type(type) { val = val; }
+    Tree(TOKEN_TYPES type, int val) : Tree(type) {this->val = val;}
 
     //num节点
     int lineno = 0;
@@ -53,25 +55,27 @@ public:
 
     void setName(const string& s) {name = s;}
 };
+//vector<Tree*> Tree::child;
 
-inline void printSpaces() {
+static int indent = -2;
+inline void printSpaces() {//打印空白
     for (int i = 0; i < indent; ++i) {
         cout << " ";
     }
 }
 
-inline void INDENT() {
+inline void INDENT() {//缩进
     indent += 2;
 }
 
 inline void UNINDENT() {
     indent -= 2;
 }
-
 //set<TOKEN_TYPES> expNode = {NUM, ID, EQ,LT,GT, LE,GE,PLUS,MINUS,TIMES,OVER};
 void printTree(const Tree *tree) {
     INDENT();
     while(tree != nullptr) {
+        printSpaces();
         NodeKind kind = tree->kind();
         TOKEN_TYPES type = tree->type;
         if (kind == expK) {
@@ -118,17 +122,18 @@ void printTree(const Tree *tree) {
             switch (type) {
                 case IF:
                     cout << "if" <<endl;
+                    break;
                 case ASSIGN:
-                    cout << "Assign to" << tree->name;
+                    cout << "Assign to: " << tree->name << endl;
                     break;
                 case REPEAT:
                     cout << "Repeat" << endl;
                     break;
                 case READ:
-                    cout << "Read:" << tree->name;
+                    cout << "Read: " << tree->name << endl;
                     break;
                 case WRITE:
-                    cout << "Write:";
+                    cout << "Write:" << endl;
                     break;
                 default:
                     cerr << "Unkown token type: " << name[type] << endl;
