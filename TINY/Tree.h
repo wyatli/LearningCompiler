@@ -9,42 +9,60 @@
 #include <vector>
 #include <set>
 #include "Token.h"
+#include "SymTab.h"
 
-set <TOKEN_TYPES> expNode = {NUM, ID, EQ, LT, GT, LE, GE, PLUS, MINUS, TIMES, OVER};
-set <TOKEN_TYPES> stmtNode = {IF, ASSIGN, READ, WRITE, REPEAT};
+set<TOKEN_TYPES> expNode = {NUM, ID, EQ, LT, GT, LE, GE, PLUS, MINUS, TIMES, OVER};
+set<TOKEN_TYPES> stmtNode = {IF, ASSIGN, READ, WRITE, REPEAT};
+set<TOKEN_TYPES> opK = { EQ, LT, GT, LE, GE, PLUS, MINUS, TIMES, OVER};
 typedef enum {
-    expK, stmt
+    INTEGER, BOOL, VOID
+} ExpType;
+typedef enum {
+    expK, stmtK
 } NodeKind;
 using namespace std;
 
+//class Analyser;
 class Tree {
     friend void printTree(const Tree *);
 
+    friend void tranverseTree(Tree *tree, SymTab *tab, void(*preProc)(SymTab *, Tree *),
+                              void(*postProc)(SymTab *, Tree *));//以给定的先序处理,和后序处理遍历树
+
+    friend void checkNode(SymTab *tab, Tree *node);
+
+    friend void checkExpNode(SymTab *tab, Tree *node);
+
+    friend void checkStmtNode(SymTab *tab, Tree *node);
+
+    friend void deleteTree(Tree*);
 private:
     void print() const {
         cout << type;
     }
-    vector<Tree *> child;
-    //子节点
-    Tree *next;
-    //相连的节点
+
+    vector<Tree *> child;//子节点
+
+    Tree *next;//相连的节点
+
     int val;
     string name;
+    ExpType expType;
 public:
     const TOKEN_TYPES type;
 
-    NodeKind kind() const { return expNode.find(type) != expNode.end() ? expK : stmt; }
+    NodeKind kind() const { return expNode.find(type) != expNode.end() ? expK : stmtK; }
 
-    void deleteTree();
+    string getName() const { return name; }
 
     //virtual void print();
 
-    Tree(TOKEN_TYPES type) : type(type),child(0, nullptr), next(nullptr){ }//必须初始化容器,和指针
+    Tree(TOKEN_TYPES type) : type(type), child(0, nullptr), next(nullptr) { }//必须初始化容器,和指针
 
     Tree(TOKEN_TYPES type, const string &n) : Tree(type) { this->name = name; };
 
     //id节点
-    Tree(TOKEN_TYPES type, int val) : Tree(type) {this->val = val;}
+    Tree(TOKEN_TYPES type, int val) : Tree(type) { this->val = val; }
 
     //num节点
     int lineno = 0;
@@ -53,11 +71,14 @@ public:
 
     void addNext(Tree *t) { next = t; }
 
-    void setName(const string& s) {name = s;}
+    void setName(const string &s) { name = s; }
+
+    void setExpK(ExpType type) {expType = type;}
 };
 //vector<Tree*> Tree::child;
 
 static int indent = -2;
+
 inline void printSpaces() {//打印空白
     for (int i = 0; i < indent; ++i) {
         cout << " ";
@@ -71,10 +92,11 @@ inline void INDENT() {//缩进
 inline void UNINDENT() {
     indent -= 2;
 }
+
 //set<TOKEN_TYPES> expNode = {NUM, ID, EQ,LT,GT, LE,GE,PLUS,MINUS,TIMES,OVER};
 void printTree(const Tree *tree) {
     INDENT();
-    while(tree != nullptr) {
+    while (tree != nullptr) {
         printSpaces();
         NodeKind kind = tree->kind();
         TOKEN_TYPES type = tree->type;
@@ -118,10 +140,10 @@ void printTree(const Tree *tree) {
             }
         }
             //set<TOKEN_TYPES> stmtNode = {IF, ASSIGN, READ, WRITE, REPEAT};
-        else if (kind == stmt) {
+        else if (kind == stmtK) {
             switch (type) {
                 case IF:
-                    cout << "if" <<endl;
+                    cout << "if" << endl;
                     break;
                 case ASSIGN:
                     cout << "Assign to: " << tree->name << endl;
@@ -140,13 +162,27 @@ void printTree(const Tree *tree) {
             }
         }
         else cerr << "Unkown token type: " << name[type] << endl;
-        for (Tree* tp : tree->child) {
+        for (Tree *tp : tree->child) {
             printTree(tp);
         }
         tree = tree->next;
     }
     UNINDENT();
 }
+void deleteTree(Tree* tree) {
+    if (tree != nullptr) {
+        auto temp = tree->child;
+        auto nex = tree->next;
+        delete tree;
+        tree = nullptr;
+        for (auto tp : temp) {
+            deleteTree(tp);
+        }
+        deleteTree(nex);
+    }
+}
+
+
 
 
 #endif //TINY_TREE_H

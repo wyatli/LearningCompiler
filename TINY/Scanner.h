@@ -9,44 +9,61 @@
 #include <cstring>
 #include <fstream>
 #include "Token.h"
+
 #ifndef TINY_SCANNER_H
 #define TINY_SCANNER_H
 
 #define MAX_RESERVES 8
 enum StateType {
-    START,INCOMMENT,INNUM,INID,INASSIGN,DONE
+    START, INCOMMENT, INNUM, INID, INASSIGN, DONE
 };
-struct {//保留字，得到的ID根据这个表来查询是否为保留字
+struct {
+    //保留字，得到的ID根据这个表来查询是否为保留字
     string name;
     TOKEN_TYPES type;
-}reserved_words[] = {{"if",IF},{"then",THEN},
-                     {"else",ELSE},{"end",END},
-                     {"repeat",REPEAT},{"until",UNTIL},
-                     {"read",READ},{"write",WRITE}};
+} reserved_words[] = {{"if",     IF},
+                      {"then",   THEN},
+                      {"else",   ELSE},
+                      {"end",    END},
+                      {"repeat", REPEAT},
+                      {"until",  UNTIL},
+                      {"read",   READ},
+                      {"write",  WRITE}};
+
 class Scanner {
-    friend void testScanner(const string& s);
+    friend void testScanner(const string &s);
+
 private:
+    string line;
+    //读取缓冲区,替代下面buffer
     int linepos = 0;
     ifstream file;
-    static char buffer[256];//读取缓冲区
+    static char buffer[256];
+    //读取缓冲区
     StateType state = START;
-    void ungetCh(){ linepos--; }//回退字符
+
+    void ungetCh() { linepos--; }
+
+    //回退字符
     //Token next;//当前token类型
     //char cur;//当前字符
-    char getCh() ;
-    Token reservedlookup(const string& s)const ;//看当前ID是否为保留字
+    char getCh();
+
+    Token reservedlookup(const string &s) const;//看当前ID是否为保留字
 public:
     int lineno = 0;
-    Scanner(const string& source){
+
+    Scanner(const string &source) {
         file.open(source);
     }
+
     Token getNextToken();
 };
 
 Token Scanner::getNextToken() {
     //cout <<"sb";
     char stringBuf[40];//存放单词的缓冲
-    int  stringIndex = 0;//缓冲索引
+    int stringIndex = 0;//缓冲索引
 
     while (state != DONE) {
         char c = getCh();
@@ -54,20 +71,26 @@ Token Scanner::getNextToken() {
         switch (state) {
             case START:
                 if (c == '{')state = INCOMMENT;
-                else if(c == ':')state = INASSIGN;
-                else if(isdigit(c)){stringBuf[stringIndex++] = c;state = INNUM;}
-                else if(isalpha(c)){stringBuf[stringIndex++] = c; state = INID;}
-                else if(c == ' ' || c == '\t' || c == '\n') {
+                else if (c == ':')state = INASSIGN;
+                else if (isdigit(c)) {
+                    stringBuf[stringIndex++] = c;
+                    state = INNUM;
+                }
+                else if (isalpha(c)) {
+                    stringBuf[stringIndex++] = c;
+                    state = INID;
+                }
+                else if (c == ' ' || c == '\t' || c == '\n') {
                     state = START;
                     if (c == '\n') {
-						cout << "linno:  " << lineno;
+                        cout << "linno:  " << lineno;
                     }
                 }
                 else {
-                        state = START;//重启自动机
+                    state = START;//重启自动机
                     switch (c) {
                         case '#':
-                        return Token(EOF_TYPE, "EOF");
+                            return Token(EOF_TYPE, "EOF");
                         case '+':
                             return Token(PLUS, "+");
                         case '-':
@@ -84,23 +107,23 @@ Token Scanner::getNextToken() {
                             return Token(RPAREN, ")");
                         case ';':
                             return Token(SEMI, ";");
-                        case '<':{
+                        case '<': {
                             if (getCh() == '=') {
                                 return Token(LT, "<=");
                             }
                             ungetCh();
-                            return Token(LT,"<");
+                            return Token(LT, "<");
                         }
                         case '>': {
                             if (getCh() == '=') {
                                 return Token(GE, ">=");
                             }
                             ungetCh();
-                            return Token(GT,"<");
+                            return Token(GT, "<");
                         }
 
-                    default:
-                        return Token(ERROR, "[Error]");
+                        default:
+                            return Token(ERROR, "[Error]");
                     }
                 }
                 break;
@@ -125,7 +148,7 @@ Token Scanner::getNextToken() {
                     state = START;
                     stringBuf[stringIndex] = '\0';
                     return reservedlookup(stringBuf);
-                   // return Token(ID, stringBuf);
+                    // return Token(ID, stringBuf);
                 }
                 stringBuf[stringIndex++] = c;
                 break;
@@ -137,23 +160,30 @@ Token Scanner::getNextToken() {
                 ungetCh();
                 break;
             default:
-                cerr<<"scanner in bug"<<endl;
+                cerr << "scanner in bug" << endl;
                 exit(1);
         }
     }
 }
 
 char Scanner::getCh() {
-    if (!file.eof()) {
-        if (linepos >= strlen(buffer)||linepos == 0) {//若当前linepos为0或linepos>buffer的size时，重新填充BUFFER
-            file.getline(buffer,255);
-            lineno ++;
-            linepos = 0;
-            return buffer[linepos++];
-        }
-        return buffer[linepos++];
+//    if (!file.eof()) {
+//        if (linepos >= strlen(buffer) || linepos == 0) {//若当前linepos为0或linepos>buffer的size时，重新填充BUFFER
+//            file.getline(buffer, 255);
+//            lineno++;
+//            linepos = 0;
+//            return buffer[linepos++];
+//        }
+//        return buffer[linepos++];
+//    }
+//    return buffer[linepos++];
+    if (linepos >= line.size() || lineno == 0) {
+        getline(file, line);
+        lineno++;
+        linepos = 0;
+        return line[linepos++];
     }
-    return buffer[linepos++];
+    return line[linepos++];
 //    string s = "if 0 < x then \n fact := 1;\n this :=12;\n else\n  x:= 20;#";
 //    return s[linepos++];
 }
@@ -168,7 +198,8 @@ Token Scanner::reservedlookup(const string &s) const {
     }
     return Token(ID, s);
 }
-void testScanner(const string& s) {//测试
+
+void testScanner(const string &s) {//测试
     Scanner scan(s);
 //    char c;
 //    while ((c = scan.getCh())) {
@@ -177,10 +208,10 @@ void testScanner(const string& s) {//测试
 //    cout <<endl;
     Token t = scan.getNextToken();
     while (t.type != EOF_TYPE) {
-        cout << t <<endl;
+        cout << t << endl;
         t = scan.getNextToken();
     }
-    cout<<t<<endl;
+    cout << t << endl;
 }
 
 

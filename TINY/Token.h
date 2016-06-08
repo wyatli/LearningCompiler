@@ -25,15 +25,15 @@ public:
     TOKEN_TYPES type;
     
     //static map<TOKEN_TYPES , string> name;
-    void printToken() {
+    void printToken() const {
         cout << name[type];
     }
 	Token& operator=(const Token&);
-    bool operator==(const Token& other) { return type == other.type;}
+    bool operator==(const Token& other) const { return type == other.type;}
     Token(const Token& t);
     Token(TOKEN_TYPES type = NONE, const string& s = "");
-    TOKEN_TYPES getType(){ return type; }
-    string toString(){ return s; }
+    TOKEN_TYPES getType()const { return type; }
+    string toString()const { return s; }
 private:
     string s;
 };

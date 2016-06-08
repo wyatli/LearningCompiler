@@ -4,10 +4,13 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/Scanner.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/main.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Analyser.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Tree.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Token.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Analyser.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Parser.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/SymTab.h" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
