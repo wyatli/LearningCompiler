@@ -8,7 +8,7 @@
 #include "SymTab.h"
 #include "Tree.h"
 #include "Parser.h"
-/*
+/*...
  * 简单的语义分析(semantic analysis)
  */
 void type_error(Tree *t, const string &msg) {
