@@ -19,3 +19,6 @@ Compiler
 ####TINY（编译原理及实践的小型编译器）
 >1. Scanner.h //扫描器，用DFA实现匹配，getNextToken
 >2. Token.h //同上
+>3. Parser.h//将scanner分解的词,根据BNF递归下降,构造语法树,用的是同形树,printTree作为输出测试
+>4. SymTab.h//符号表,树节点的名称(key),以及所在的行数(lineno)和
+>5. Analyser.h//用先序后序遍历树节点实现的简单的语义分析器,具有识别id是否赋值,以及type是否与类型相对应的基本检查如:if exp或者until exp ,exp必须为bool值,且当exp中含有id时,必须检查此id在之前赋过值(:=符号),检查了左右赋值必须同时为integer..
