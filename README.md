@@ -25,3 +25,6 @@ Compiler
 
 #### StanfordCompiler(cs143,斯坦福编译器)
 >1.cool.lex //cool语言的lexer(词法分析器),用flex实现,实现语言为c++
+
+#### REengine(手工构造的正则表达式引擎)
+>1.NFA.h //不确定有限自动机,Thompson算法构造,关键算法是一系列build方法,算法框架是通过扫描正则表达式,将其转换为后缀表达式,然后在扫描之,根据不同的字符构造dfa
