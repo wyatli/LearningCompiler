@@ -12,6 +12,9 @@
 extern int epsilon;
 
 struct NFA;
+struct State;
+struct Edge;
+
 void destroyState(State *sp);
 
 NFA *buildSimple(char c);//a
@@ -31,7 +34,6 @@ NFA *buildNFA(const std::string &);
 
 using namespace std;//0x6927d0
 
-struct Edge;
 struct State {
     static int counter;
     vector<Edge *> edgs;
@@ -50,6 +52,9 @@ struct State {
         auto it = find(edgs.begin(), edgs.end(), e);
         edgs.erase(it);
     }
+    ~State() {
+        destroyState(this);
+    }
 };
 
 struct Edge {
@@ -65,18 +70,15 @@ public:
 
 
 struct NFA {
+    //状态起始节点和接受状态节点，以及其实节点的下一个节点（实际上的第一个节点）
     State *start;
     State *end;
     State *next;
-    //状态起始节点
     NFA(State* next, State *end) : start(new State(false)), end(end){
         start->addEdge(new Edge(epsilon, next));//start-(epsilon)->next
         this->next = next;
     }
-    ~NFA() {//只删除收尾节点,中间的保留留作后用,若要彻底删除之,则单独调用deleteNFA()
-        destroyState(start);
-        destroyState(end);
-    }
+    //不能西沟以上节点,因为在连接时候可能会用到以上节点之一
     State* nextFromStart() const{
         return next;
     }
