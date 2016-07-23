@@ -5,24 +5,28 @@
 #include "match.h"
 #include <set>
 #include <iostream>
-
+/*
+ * NFA直接匹配
+ */
 set<State*> marked;//记录已经访问过的
 
 bool isMarked(State* state) {
     return marked.find(state) != marked.end();
 }
 
-void epsilon_closure(State* state,vector<State*>& vec) {//深搜,计算epsilon闭包,添加到vector中
+void epsilon_closure(State* state,set<State*>& ss) {//深搜,计算epsilon闭包,添加到vector中
     marked.insert(state);//标记已访问
-    vec.push_back(state);//添加至vec中
+    ss.insert(state);//添加至vec中
     for (Edge* ep : state->edgs) {
         if (ep->ch == epsilon) { //若该边属于epsilon转换边
             State* next = ep->nextState;
             if (!isMarked(next) ) {//若没有访问过,就访问他
-                epsilon_closure(next, vec);
+                epsilon_closure(next, ss);
             }
         }
     }
+
+    marked.clear();
 }
 
 void match(const std::string patern, const std::string& toMatch) {
@@ -30,8 +34,8 @@ void match(const std::string patern, const std::string& toMatch) {
     match(nfa, toMatch);
 }
 
-void transform(char c, vector<State*>& oldStates,
-               vector<State*>& newStates) {//将当前状态集中，可以通过c转换的状态的epsilon闭包添加至新的状态集
+void transform(char c, set<State*>& oldStates,
+               set<State*>& newStates) {//将当前状态集中，可以通过c转换的状态的epsilon闭包添加至新的状态集
 
     for (State* s : oldStates) {//向新状态集添加States
         for (Edge* e : s->edgs) {
@@ -45,25 +49,27 @@ void transform(char c, vector<State*>& oldStates,
     oldStates.clear();//情况原来状态集合
 
     for (State* state : newStates) {//写回当前状态，并把标记过的状态设为未标记
-        oldStates.push_back(state);
+        oldStates.insert(state);
     }
 
-    marked.clear();
+    //marked.clear();
     newStates.clear();
 
 }
 
 void match(NFA* nfa, const std::string& s) {
-    std::vector<State*> oldStates;//当前状态集
-    std::vector<State*> newStates;//新状态集（缓冲作用）
+    std::set<State*> oldStates;//当前状态集
+    std::set<State*> newStates;//新状态集（缓冲作用）
     epsilon_closure(nfa->start, oldStates);//将起始状态的epsilon闭包添加进当前状态集
-    marked.clear();//必须加这一行，若是不加则不会将此时oldStates中的状态添加至后面的状态集中
+    //marked.clear();//必须加这一行，若是不加则不会将此时oldStates中的状态添加至后面的状态集中
+
+
     for(auto c : s) {
         transform(c, oldStates, newStates);//S = e_c(move(S,c));
     }
     if (find_if(oldStates.begin(), oldStates.end(),
                 [](State* st){ return st->accepted;}) == oldStates.end()) {//若在最终集合中能找不到接受状态
-        std::cerr << "pattern mis match" << std::endl;
+        std::cout << "pattern mismatch" << std::endl;
     }
 }
 

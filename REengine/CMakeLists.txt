@@ -3,5 +3,5 @@ project(REengine)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-set(SOURCE_FILES main.cpp NFA.cpp NFA.h match.h match.cpp)
+set(SOURCE_FILES main.cpp NFA.cpp NFA.h match.h match.cpp match2.cpp match2.h)
 add_executable(REengine ${SOURCE_FILES})

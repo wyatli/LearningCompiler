@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <string>
 #include <stack>
+#include <map>
+
 extern int epsilon;
 
 struct NFA;
@@ -83,4 +85,6 @@ struct NFA {
         return next;
     }
 };
+
+
 #endif //REENGINE_NFA_H
