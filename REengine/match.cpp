@@ -65,6 +65,7 @@ void match(NFA* nfa, const std::string& s) {
 
 
     for(auto c : s) {
+       // cout << "sb" <<endl;
         transform(c, oldStates, newStates);//S = e_c(move(S,c));
     }
     if (find_if(oldStates.begin(), oldStates.end(),

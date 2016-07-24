@@ -9,9 +9,10 @@ int main() {
     //epsilon = 257;
 
     NFA* nfa = buildNFA("ab|c.");
-    match(nfa, "ff");
+    match(nfa, "bc");
 
     DFA* dfa = buidDFA(nfa);
+    match(dfa, "bc");
 
     return 0;
 }
