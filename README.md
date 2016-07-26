@@ -30,3 +30,8 @@ Compiler
 >1. NFA.h //不确定有限自动机,Thompson算法构造,关键算法是一系列build方法,算法框架是通过扫描正则表达式,将其转换为后缀表达式,然后在扫描之,根据不同的字符构造nfa<br>
 >2. match.h//用构造的nfa去匹配字符串
 >3. match2.h//将nfa转换为dfa然后用构造出来的表驱动去匹配,此算法简单快速
+
+#### JsonParser(json解析器)
+>1. lex.h//词法分析器,原理同上面程序差不多
+>2. parser.h//递归下降生成AST(json object相当于AST的节点,里面抽象了一个Json_Value作为节点父类),**文法见该文件顶部**
+>3. json.h//json的类的组成,由Json_Value(键值对的值,必须抽象这么一个东西作为数字,布尔值,字符串的基类)作为基类,Json_String,Json_Object(map作为原型实现,可以当做一个adapter),Json_Array(由'['和']'之间的那些Json_Object组成)作为子类
